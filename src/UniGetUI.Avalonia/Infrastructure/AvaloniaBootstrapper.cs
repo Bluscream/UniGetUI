@@ -91,14 +91,14 @@ internal static class AvaloniaBootstrapper
     private static async Task ShowIntegrityViolationDialogAsync()
     {
         if (MainWindow.Instance is not { } owner) return;
-        await new IntegrityViolationDialog().ShowDialog(owner);
+        await owner.ShowDialogAndRestoreVisibilityAsync(new IntegrityViolationDialog());
     }
 
     private static async Task ShowMissingDependencyDialogAsync(
         ManagerDependency dep, int current, int total)
     {
         if (MainWindow.Instance is not { } owner) return;
-        await new MissingDependencyDialog(dep, current, total).ShowDialog(owner);
+        await owner.ShowDialogAndRestoreVisibilityAsync(new MissingDependencyDialog(dep, current, total));
     }
 
     private static Task InitializeSharedServicesAsync()

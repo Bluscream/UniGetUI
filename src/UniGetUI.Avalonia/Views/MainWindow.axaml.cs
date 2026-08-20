@@ -829,6 +829,11 @@ public partial class MainWindow : Window
     {
         try
         {
+            // Width/Height stay NaN until the window has been laid out, which never happens on a
+            // daemon launch the user has not opened yet. Saving then would persist a 0x0 size.
+            if (double.IsNaN(Width) || double.IsNaN(Height))
+                return;
+
             int state = WindowState == WindowState.Maximized ? 1 : 0;
             string geometry = $"v2,{Position.X},{Position.Y},{(int)Width},{(int)Height},{state}";
             Settings.SetValue(Settings.K.WindowGeometry, geometry);
@@ -1554,6 +1559,25 @@ public partial class MainWindow : Window
     {
         var dialog = new ManageIgnoredUpdatesWindow();
         await ShowImmersiveDialogAsync(dialog);
+    }
+
+    // Immersive dialogs are hosted inside this window, so they are unreachable — and never complete —
+    // while it is off screen (daemon launch). Bring it up for the dialog and put it back after.
+    public async Task ShowDialogAndRestoreVisibilityAsync(ImmersiveDialog dialog)
+    {
+        bool reshide = !IsVisible;
+        if (reshide)
+            Show();
+
+        try
+        {
+            await dialog.ShowDialog(this);
+        }
+        finally
+        {
+            if (reshide)
+                Hide();
+        }
     }
 
     public async Task ShowImmersiveDialogAsync(ImmersiveDialog dialog)
