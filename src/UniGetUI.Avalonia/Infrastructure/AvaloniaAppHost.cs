@@ -60,6 +60,9 @@ public static class AvaloniaAppHost
         AppDomain.CurrentDomain.UnhandledException += (_, e) =>
             CrashHandler.ReportFatalException((Exception)e.ExceptionObject);
 
+        args = SharedPreUiCommandDispatcher.IgnoreArgumentsInjectedIntoProtocolLaunch(args);
+        CoreData.SetSanitizedProcessArguments(args);
+
         Logger.RedactUsername = Core.SettingsEngine.Settings.Get(Core.SettingsEngine.Settings.K.RedactUsernameInLog);
 
         ProcessEnvironmentConfigurator.ConfigurePingetStorage();
