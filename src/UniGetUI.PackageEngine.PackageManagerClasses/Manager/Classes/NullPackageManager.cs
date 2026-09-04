@@ -27,6 +27,10 @@ namespace UniGetUI.PackageEngine.Classes.Manager
         public Encoding OutputEncoding => Encoding.UTF8;
         public bool InstallerUrlFollowsPackageVersion => false;
 
+        public bool CommandLineIsShellInterpreted => false;
+
+        public bool IdentifiersAreQuotedOnCommandLine => false;
+
         public int? CompareVersions(string versionA, string versionB)
         {
             var parsedA = CoreTools.VersionStringToStruct(versionA);
@@ -162,6 +166,12 @@ namespace UniGetUI.PackageEngine.Classes.Manager
 
     internal sealed class NullPkgOperationHelper : IPackageOperationHelper
     {
+        public IReadOnlyList<string> GetStandaloneParameters(
+            IPackage package,
+            InstallOptions options,
+            OperationType operation
+        ) => GetParameters(package, options, operation);
+
         public IReadOnlyList<string> GetParameters(
             IPackage package,
             InstallOptions options,
